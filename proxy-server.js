@@ -20,7 +20,15 @@ app.get('/proxy/dns', async (req, res) => {
   try {
     // Proxy the request to the actual API
     const encodedSubdomain = encodeURIComponent(subdomain);
-    const response = await axios.get(`https://networkcalc.com/api/dns/lookup/${encodedSubdomain}`);
+    
+    // Send request to target API with correct headers
+    const response = await axios.get(`https://networkcalc.com/api/dns/lookup/${encodedSubdomain}`, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36', // Add a User-Agent to avoid restrictions
+        'Accept': 'application/json',
+        'Host': 'networkcalc.com',  // Explicitly set the correct Host header
+      }
+    });
 
     // Send the API response back to the client
     res.json(response.data);
