@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: cors-proxy
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: CORSANYWHERE_ALLOW_ALL
+        value: 'true'
