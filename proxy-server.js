@@ -3,13 +3,13 @@ const axios = require('axios');
 const cors = require('cors');
 const app = express();
 
-// Use CORS middleware to allow cross-origin requests from your React app
+// CORS middleware for cross-origin requests
 app.use(cors());
 
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-// Route for handling DNS lookup requests
+// Proxy route for DNS lookup
 app.get('/proxy/dns', async (req, res) => {
   const { subdomain } = req.query; // Extract subdomain from query parameters
 
@@ -18,27 +18,28 @@ app.get('/proxy/dns', async (req, res) => {
   }
 
   try {
-    // Proxy the request to the actual API
     const encodedSubdomain = encodeURIComponent(subdomain);
-    
-    // Send request to target API with correct headers
+
+    // Proxy the request to the target API
     const response = await axios.get(`https://networkcalc.com/api/dns/lookup/${encodedSubdomain}`, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36', // Add a User-Agent to avoid restrictions
-        'Accept': 'application/json',
-        'Host': 'networkcalc.com',  // Explicitly set the correct Host header
+        'Content-Type': 'application/json',
+        'Origin': 'https://dns-backup-machine.netlify.app/',  // Set a valid origin
+        'X-Requested-With': 'XMLHttpRequest', // Standard for cross-origin AJAX requests
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36', // Mimic a browser
+        'Host': 'networkcalc.com'  // Correct the Host header
       }
     });
 
-    // Send the API response back to the client
+    // Return the API response data to the client
     res.json(response.data);
   } catch (error) {
-    // Handle any errors that occur during the request
+    console.error('Error during proxy request:', error);
     res.status(500).json({ error: 'Error fetching data from API', details: error.message });
   }
 });
 
-// Set up the server to listen on a specific port
+// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
