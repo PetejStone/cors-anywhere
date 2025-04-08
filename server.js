@@ -4,9 +4,7 @@ var port = process.env.PORT || 8080;
 var originBlacklist = parseEnvList(process.env.CORSANYWHERE_BLACKLIST);
 var originWhitelist = parseEnvList(process.env.CORSANYWHERE_WHITELIST);
 function parseEnvList(env) {
-  if (!env) {
-    return [];
-  }
+  if (!env) return [];
   return env.split(',');
 }
 
@@ -15,8 +13,8 @@ var cors_proxy = require('./lib/cors-anywhere');
 
 // List of trusted origins
 const allowedOrigins = [
-  'http://localhost:3000', // Local development
-  'https://dns-backup-machine.netlify.app', // Your production site
+  'http://localhost:3000',  // Allow localhost
+  'https://dns-backup-machine.netlify.app',  // Allow your prod site
 ];
 
 cors_proxy.createServer({
@@ -34,20 +32,18 @@ cors_proxy.createServer({
     'total-route-time',
   ],
   redirectSameOrigin: true,
-  httpProxyOptions: {
-    xfwd: false,
-  },
+  httpProxyOptions: { xfwd: false },
   onRequest: function(req, res) {
-    // Ensure the Origin header is set dynamically
     if (allowedOrigins.includes(req.headers['origin'])) {
-      console.log('Origin is allowed:', req.headers['origin']);
+      console.log('Allowed Origin:', req.headers['origin']);
     } else {
-      req.headers['origin'] = allowedOrigins[1]; // Default to your production site if Origin is not allowed
+      req.headers['origin'] = allowedOrigins[1];  // Default to your production site if Origin is not allowed
+      console.log('Defaulting Origin to:', req.headers['origin']);
     }
 
-    // Add 'X-Requested-With' header if missing
     if (!req.headers['x-requested-with']) {
       req.headers['x-requested-with'] = 'XMLHttpRequest';
+      console.log('Added X-Requested-With header');
     }
 
     console.log('Forwarding request with Origin:', req.headers['origin']);
