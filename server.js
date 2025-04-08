@@ -46,11 +46,15 @@ cors_proxy.createServer({
     // Do not add X-Forwarded-For, etc. headers, because Heroku already adds it.
     xfwd: false,
   },
-  // Add this function to ensure we inject the 'Origin' header if missing
+  // Modify this function to inject the correct Origin header based on the environment
   onRequest: function(req, res) {
-    // Set the Origin header dynamically, or use a default one if it's missing
-    if (!req.headers['origin']) {
-      req.headers['origin'] = 'https://dns-backup-machine.netlify.app/'; // Use the domain where you want requests to appear as originating from
+    // Check if the request is coming from localhost
+    if (req.headers['origin'] === 'http://localhost:3000') {
+      // Allow localhost for testing
+      req.headers['origin'] = 'http://localhost:3000'; // Allow requests from localhost
+    } else if (!req.headers['origin']) {
+      // Set the Origin header dynamically for other requests if it's missing
+      req.headers['origin'] = 'https://dns-backup-machine.netlify.app/'; // Default origin
     }
 
     // Add 'X-Requested-With' header (important for some CORS APIs)
