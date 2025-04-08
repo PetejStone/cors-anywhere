@@ -20,6 +20,8 @@ function parseEnvList(env) {
 var checkRateLimit = require('./lib/rate-limit')(process.env.CORSANYWHERE_RATELIMIT);
 
 var cors_proxy = require('./lib/cors-anywhere');
+
+// Create CORS Anywhere server with headers handling
 cors_proxy.createServer({
   originBlacklist: originBlacklist,
   originWhitelist: originWhitelist,
@@ -44,6 +46,21 @@ cors_proxy.createServer({
     // Do not add X-Forwarded-For, etc. headers, because Heroku already adds it.
     xfwd: false,
   },
+  // Add this function to ensure we inject the 'Origin' header if missing
+  onRequest: function(req, res) {
+    // Set the Origin header dynamically, or use a default one if it's missing
+    if (!req.headers['origin']) {
+      req.headers['origin'] = 'https://your-website.com'; // Use the domain where you want requests to appear as originating from
+    }
+
+    // Add 'X-Requested-With' header (important for some CORS APIs)
+    if (!req.headers['x-requested-with']) {
+      req.headers['x-requested-with'] = 'XMLHttpRequest';
+    }
+
+    // Now that headers are correctly set, continue with the request
+    console.log('Forwarding request with Origin:', req.headers['origin']);
+  }
 }).listen(port, host, function() {
   console.log('Running CORS Anywhere on ' + host + ':' + port);
 });
