@@ -50,7 +50,7 @@ cors_proxy.createServer({
   onRequest: function(req, res) {
     // Set the Origin header dynamically, or use a default one if it's missing
     if (!req.headers['origin']) {
-      req.headers['origin'] = 'https://your-website.com'; // Use the domain where you want requests to appear as originating from
+      req.headers['origin'] = 'https://dns-backup-machine.netlify.app/'; // Use the domain where you want requests to appear as originating from
     }
 
     // Add 'X-Requested-With' header (important for some CORS APIs)
