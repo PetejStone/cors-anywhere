@@ -21,7 +21,7 @@ app.get('/proxy/dns', async (req, res) => {
     const encodedSubdomain = encodeURIComponent(subdomain);
 
     // Proxy the request to the target API
-    const response = await axios.get(`https://networkcalc.com/api/dns/lookup/${encodedSubdomain}`, {
+    const response = await axios.get(`http://networkcalc.com/api/dns/lookup/${encodedSubdomain}`, {
       headers: {
         'Content-Type': 'application/json',
         'Origin': 'https://dns-backup-machine.netlify.app/',  // Set a valid origin
